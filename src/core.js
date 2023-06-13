@@ -37,7 +37,36 @@ function loadPage (
 ) {
   debuglog('page load start')
   let waitingForPageLoad = true
-  let loadPagePromise = page.goto(url, pageGotoOptions)
+  const initialLoadPagePromise = page.goto(url, pageGotoOptions)
+
+  const postRequestPromise = initialLoadPagePromise
+    .then(() => {
+      return page.evaluate(
+        async (postUrl, body) => {
+          await window.fetch(postUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          })
+        },
+        'https://www.ifixit.com/api/2.0/store/user/store_preference',
+        { newStore: 'us' }
+      )
+    })
+    .catch(error => {
+      debuglog('Error setting the preferred store:', error)
+    })
+
+  let loadPagePromise = postRequestPromise
+    .then(() => {
+      return page.reload()
+    })
+    .catch(error => {
+      debuglog('Error loading the page:', error)
+    })
+
   if (pageLoadSkipTimeout) {
     loadPagePromise = Promise.race([
       loadPagePromise,
