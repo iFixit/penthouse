@@ -52,7 +52,7 @@ function loadPage (
           })
         },
         'https://www.ifixit.com/api/2.0/store/user/store_preference',
-        { newStore: 'us' }
+        { newStore: 'au' }
       )
     })
     .catch(error => {
