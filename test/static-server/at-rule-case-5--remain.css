@@ -1,0 +1,30 @@
+@layer properties;
+@layer theme, base, components, utilities;
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@layer theme {
+  :root {
+    --color-brand-500: #1975f1;
+  }
+}
+@layer utilities {
+  #box1 {
+    border-style: var(--tw-border-style);
+    color: var(--color-brand-500);
+  }
+  @media (min-width: 40em) {
+    #box2 {
+      padding: 1rem;
+    }
+  }
+}
+@layer properties {
+  @supports (-moz-orient: inline) {
+    #box1 {
+      --tw-border-style: solid;
+    }
+  }
+}
