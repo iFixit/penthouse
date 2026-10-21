@@ -148,6 +148,33 @@ describe('penthouse core tests', () => {
       })
   })
 
+  /* Case 5: cascade layers and registered custom properties [REMAIN]
+   @layer blocks and statements, @property
+   */
+  it('should keep case 5 @-rules (@layer, @property)', () => {
+    var atRuleCase5RemainCssFilePath = path.join(__dirname, 'static-server', 'at-rule-case-5--remain.css')
+    var atRuleCase5RemainCss = read(atRuleCase5RemainCssFilePath).toString()
+
+    return penthouse({
+      url: page1FileUrl,
+      css: atRuleCase5RemainCssFilePath
+    })
+      .then(result => {
+        expect(result).toEqual(normaliseCss(atRuleCase5RemainCss))
+      })
+  })
+
+  it('should keep an @layer without critical rules as a statement, to keep the layer order', () => {
+    return penthouse({
+      url: page1FileUrl,
+      cssString: '@layer base { .notOnPage { color: red; } } @layer utilities { #box1 { color: red; @layer nested { .notOnPage { color: blue; } } } .notOnPage { color: blue; } }'
+    })
+      .then(result => {
+        // a @layer statement nested in a style rule is invalid, so that one is removed
+        expect(result).toEqual(normaliseCss('@layer base; @layer utilities { #box1 { color: red; } }'))
+      })
+  })
+
   it('should keep self clearing rules when needed to stay outside the fold', () => {
     var clearSelfRemainCssFilePath = path.join(__dirname, 'static-server', 'clearSelf--remain.css')
     var clearSelfRemainCss = read(clearSelfRemainCssFilePath).toString()
